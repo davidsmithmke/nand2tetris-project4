@@ -14,27 +14,31 @@
 	D=A
 	@keyboard
 	M=D
+(CHECK_KEYBOARD)
 	// Set current to last screen pixel map.
 	@24575
 	D=A
 	@current
 	M=D
-(CHECK_KEYBOARD)
 	// If keyboard is pressed, fill the screen.
 	@keyboard
 	A=M
 	D=M
-	@FILL
+	@fillvalue
+	M=-1
+	@DRAW
 	D;JNE
 	// Otherwise, clear the screen.
-	@CLEAR
-	0;JMP
-(FILL)
-	// Fill current pixel.
+	@fillvalue
+	M=0
+(DRAW)
+	// Fill or clear current pixel, depending on fillvalue.
+	@fillvalue
+	D=M
 	@current
 	A=M
-	M=-1
-	// If current pixel map is first pixel map there is nothing left to fill, so
+	M=D
+	// If current pixel map is first pixel map there is nothing left to draw, so
 	//jump back to keyboard check.
 	@current
 	D=M
@@ -45,25 +49,6 @@
 	// Decrement current pixel map.
 	@current
 	M=M-1
-	// Continue filling next pixel map.
-	@FILL
-	0;JMP
-(CLEAR)
-	// Clear current pixel.
-	@current
-	A=M
-	M=0
-	// If current pixel map is last pixel map there is nothing left to clear, so
-	// jump back to keyboard check.
-	@current
-	D=M
-	@24575
-	D=D-A
-	@CHECK_KEYBOARD
-	D;JGE
-	// Increment current pixel map.
-	@current
-	M=M+1
-	// Continue clearing next pixel map.
-	@CLEAR
+	// Continue drawing next pixel map.
+	@DRAW
 	0;JMP
